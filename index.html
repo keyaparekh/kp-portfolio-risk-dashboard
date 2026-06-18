@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Portfolio Risk Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Portfolio Analytics</p>
+        <h1>Portfolio Risk Dashboard</h1>
+      </div>
+      <div class="header-actions" aria-label="Dashboard actions">
+        <button id="rebalanceBtn" class="icon-button" type="button" title="Add holding">
+          <span aria-hidden="true">＋</span>
+          <span class="sr-only">Add holding</span>
+        </button>
+        <button id="resetBtn" class="icon-button" type="button" title="Reset portfolio">
+          <span aria-hidden="true">↺</span>
+          <span class="sr-only">Reset portfolio</span>
+        </button>
+        <button id="reportBtn" class="report-button" type="button">Export Memo</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="sidebar" aria-label="Portfolio controls">
+        <section>
+          <div class="section-heading">
+            <h2>Assumptions</h2>
+          </div>
+          <label class="field">
+            Confidence Level
+            <select id="confidence">
+              <option value="0.95">95%</option>
+              <option value="0.99">99%</option>
+            </select>
+          </label>
+          <label class="field">
+            Lookback Window
+            <select id="lookback">
+              <option value="252">1 year</option>
+              <option value="756" selected>3 years</option>
+              <option value="99999">Full sample</option>
+            </select>
+          </label>
+        </section>
+
+        <section>
+          <div class="section-heading">
+            <h2>Holdings</h2>
+            <span id="portfolioValue" class="weight-total">$0</span>
+          </div>
+          <datalist id="tickerList"></datalist>
+          <div id="allocations" class="allocations"></div>
+          <label class="field broker-field">
+            Broker Total
+            <input id="brokerValue" type="number" min="0" step="0.01" value="1600.49" />
+          </label>
+          <div id="brokerSync" class="broker-sync">-</div>
+        </section>
+      </aside>
+
+      <section class="dashboard" aria-label="Portfolio risk dashboard">
+        <section class="metrics-grid" aria-label="Key risk metrics">
+          <article class="metric">
+            <span>Annual Return</span>
+            <strong id="annualReturn">-</strong>
+          </article>
+          <article class="metric">
+            <span>Annual Volatility</span>
+            <strong id="annualVol">-</strong>
+          </article>
+          <article class="metric">
+            <span>Sharpe Ratio</span>
+            <strong id="sharpe">-</strong>
+          </article>
+          <article class="metric">
+            <span>Max Drawdown</span>
+            <strong id="maxDrawdown">-</strong>
+          </article>
+          <article class="metric">
+            <span>Historical VaR</span>
+            <strong id="varMetric">-</strong>
+          </article>
+          <article class="metric">
+            <span>Historical CVaR</span>
+            <strong id="cvarMetric">-</strong>
+          </article>
+        </section>
+
+        <section class="content-grid">
+          <article class="panel wide data-note">
+            <div>
+              <h2>Market Data</h2>
+              <p id="dataSource">-</p>
+            </div>
+          </article>
+
+          <article id="memoPanel" class="panel wide memo-panel hidden">
+            <div class="panel-header">
+              <h2>Investment Risk Memo</h2>
+              <button id="printMemoBtn" class="secondary-button" type="button">Print / Save PDF</button>
+            </div>
+            <div id="memoContent"></div>
+          </article>
+
+          <article class="panel wide">
+            <div class="panel-header">
+              <h2>Cumulative Performance</h2>
+              <span id="sampleRange"></span>
+            </div>
+            <canvas id="performanceChart" height="250"></canvas>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <h2>Drawdown</h2>
+            </div>
+            <canvas id="drawdownChart" height="230"></canvas>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <h2>Return Distribution</h2>
+            </div>
+            <canvas id="histogramChart" height="230"></canvas>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <h2>How To Adjust</h2>
+            </div>
+            <div id="recommendations" class="recommendations"></div>
+          </article>
+
+          <article class="panel wide">
+            <div class="panel-header">
+              <h2>Risk-To-Action Engine</h2>
+              <span>Generated rebalance scenarios</span>
+            </div>
+            <div id="rebalanceLab" class="rebalance-lab"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <h2>Stress Tests</h2>
+            </div>
+            <div id="stressTests" class="stress-tests"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <h2>Asset Correlation</h2>
+            </div>
+            <div id="correlationMatrix" class="correlation-matrix"></div>
+          </article>
+        </section>
+      </section>
+    </main>
+
+    <script src="market-data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
