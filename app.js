@@ -303,7 +303,7 @@ async function resetHoldings() {
 
 async function applyPreset(preset) {
   if (preset === "individual") {
-    state.brokerValue = 67212.40;
+    state.brokerValue = 0;
     state.holdings = [
       { ticker: "NVDA", shares: 34.54 },
       { ticker: "TSLA", shares: 13.56 },
@@ -413,12 +413,12 @@ function updateHoldingLabels(portfolio) {
 
 function updateBrokerSync(portfolio) {
   if (!state.brokerValue) {
-    elements.brokerSync.textContent = `Selected holdings: ${formatCurrency(portfolio.holdingsValue)}. Add an optional account total to reconcile cash, crypto, options, and quote timing.`;
+    elements.brokerSync.textContent = `Selected holdings: ${formatCurrency(portfolio.holdingsValue)}. Optional: enter the broker's stock subtotal, not the full account value, to reconcile this stock-only view.`;
     return;
   }
   const gap = portfolio.reconciliationValue;
   const gapLabel = gap >= 0 ? "above" : "below";
-  elements.brokerSync.textContent = `Account total: ${formatCurrency(portfolio.brokerValue)} · Selected holdings: ${formatCurrency(portfolio.holdingsValue)} · ${formatCurrency(Math.abs(gap))} ${gapLabel} selected live marks.`;
+  elements.brokerSync.textContent = `Broker subtotal entered: ${formatCurrency(portfolio.brokerValue)} · Selected holdings: ${formatCurrency(portfolio.holdingsValue)} · ${formatCurrency(Math.abs(gap))} ${gapLabel} selected live marks.`;
 }
 
 function calculateMetrics(returns, drawdowns) {
@@ -630,7 +630,7 @@ function buildMemoContent(analysis) {
             </div>
             <div class="meta">
               Selected holdings: ${formatCurrency(portfolio.holdingsValue)}<br />
-              Account total: ${portfolio.brokerValue ? formatCurrency(portfolio.brokerValue) : "Not entered"}<br />
+              Broker stock subtotal: ${portfolio.brokerValue ? formatCurrency(portfolio.brokerValue) : "Not entered"}<br />
               Reconciliation: ${formatCurrency(portfolio.reconciliationValue)}<br />
               Lookback: ${firstDate} - ${lastDate}<br />
               Data: ${formatDate(market.latestDate)} adjusted closes
