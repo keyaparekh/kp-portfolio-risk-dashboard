@@ -20,6 +20,13 @@ TICKERS = [
     "CIBR",
     "BOTZ",
     "VOT",
+    "ASML",
+    "SPHR",
+    "ANET",
+    "AGQ",
+    "SLV",
+    "SIL",
+    "SPCX",
     "SPY",
     "QQQ",
     "TLT",
@@ -83,7 +90,7 @@ def main():
     }
     for ticker in TICKERS:
         item = fetch_chart(ticker)
-        if len(item["rows"]) < 100:
+        if len(item["rows"]) < 2:
             raise RuntimeError(f"Not enough data for {ticker}")
         data["tickers"][ticker] = item
 
