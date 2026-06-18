@@ -1,13 +1,20 @@
 const defaultUniverse = [
   { ticker: "SPY", name: "US Equity ETF", color: "#17365d", type: "ETF" },
   { ticker: "QQQ", name: "Growth Equity ETF", color: "#137c78", type: "ETF" },
+  { ticker: "VOO", name: "Vanguard S&P 500 ETF", color: "#2e8b57", type: "ETF" },
+  { ticker: "BND", name: "Total Bond Market ETF", color: "#475467", type: "ETF" },
   { ticker: "TLT", name: "Long Treasuries ETF", color: "#6b5ca5", type: "ETF" },
+  { ticker: "SGOV", name: "Short Treasury ETF", color: "#486581", type: "ETF" },
   { ticker: "GLD", name: "Gold ETF", color: "#b7791f", type: "ETF" },
+  { ticker: "SCHD", name: "Dividend Equity ETF", color: "#3c6e71", type: "ETF" },
+  { ticker: "VXUS", name: "Total International ETF", color: "#0e7490", type: "ETF" },
+  { ticker: "SMH", name: "Semiconductor ETF", color: "#7c3aed", type: "ETF" },
   { ticker: "VNQ", name: "Real Estate ETF", color: "#9b3d3d", type: "ETF" },
   { ticker: "EFA", name: "International Equity ETF", color: "#3c6e71", type: "ETF" },
   { ticker: "AAPL", name: "Apple", color: "#0f766e", type: "Stock" },
   { ticker: "MSFT", name: "Microsoft", color: "#2563eb", type: "Stock" },
   { ticker: "NVDA", name: "NVIDIA", color: "#16a34a", type: "Stock" },
+  { ticker: "TSLA", name: "Tesla", color: "#b42318", type: "Stock" },
   { ticker: "AMZN", name: "Amazon", color: "#ea580c", type: "Stock" },
   { ticker: "META", name: "Meta", color: "#7c3aed", type: "Stock" },
   { ticker: "GOOGL", name: "Alphabet", color: "#dc2626", type: "Stock" },
@@ -23,19 +30,13 @@ const state = {
   liveMode: false,
   symbolsSource: "Local fallback list",
   dataSource: "Saved local market-data.js",
-  brokerValue: 1600.49,
+  brokerValue: 0,
   holdings: [
-    { ticker: "ANET", shares: 1.28 },
-    { ticker: "SPHR", shares: 2.96 },
-    { ticker: "ASML", shares: 0.094931 },
-    { ticker: "NVDA", shares: 1.23 },
-    { ticker: "QQQ", shares: 0.318869 },
-    { ticker: "LAES", shares: 6.95 },
-    { ticker: "MU", shares: 0.109558 },
-    { ticker: "OKLO", shares: 0.324327 },
-    { ticker: "AMD", shares: 0.099571 },
-    { ticker: "PLTR", shares: 0.066135 },
-    { ticker: "RIVN", shares: 0.330469 },
+    { ticker: "SPY", shares: 10 },
+    { ticker: "QQQ", shares: 4 },
+    { ticker: "BND", shares: 20 },
+    { ticker: "GLD", shares: 3 },
+    { ticker: "NVDA", shares: 2 },
   ],
 };
 
@@ -122,7 +123,7 @@ async function loadSymbols() {
 }
 
 function renderTickerList() {
-  const popular = ["SPY", "QQQ", "TLT", "GLD", "AAPL", "MSFT", "NVDA", "AMZN", "META", "GOOGL", "JPM", "GS", "BLK", "BRK-B"];
+  const popular = ["SPY", "QQQ", "VOO", "BND", "GLD", "TLT", "SGOV", "AAPL", "MSFT", "NVDA", "TSLA", "AMZN", "META", "GOOGL", "JPM", "GS", "BLK", "BRK-B", "VXUS", "SCHD", "SMH"];
   const ordered = [
     ...popular.map((ticker) => universe.find((item) => item.ticker === ticker)).filter(Boolean),
     ...universe.filter((item) => !popular.includes(item.ticker)).slice(0, 5000),
@@ -291,17 +292,11 @@ async function addHolding() {
 
 async function resetHoldings() {
   state.holdings = [
-    { ticker: "ANET", shares: 1.28 },
-    { ticker: "SPHR", shares: 2.96 },
-    { ticker: "ASML", shares: 0.094931 },
-    { ticker: "NVDA", shares: 1.23 },
-    { ticker: "QQQ", shares: 0.318869 },
-    { ticker: "LAES", shares: 6.95 },
-    { ticker: "MU", shares: 0.109558 },
-    { ticker: "OKLO", shares: 0.324327 },
-    { ticker: "AMD", shares: 0.099571 },
-    { ticker: "PLTR", shares: 0.066135 },
-    { ticker: "RIVN", shares: 0.330469 },
+    { ticker: "SPY", shares: 10 },
+    { ticker: "QQQ", shares: 4 },
+    { ticker: "BND", shares: 20 },
+    { ticker: "GLD", shares: 3 },
+    { ticker: "NVDA", shares: 2 },
   ];
   await loadMarketDataForHoldings();
   renderHoldings();
@@ -352,7 +347,7 @@ function getPortfolio() {
   const holdingsValue = active.reduce((sum, holding) => sum + holding.value, 0);
   const brokerValue = state.brokerValue > 0 ? state.brokerValue : 0;
   const reconciliationValue = brokerValue > 0 ? brokerValue - holdingsValue : 0;
-  const totalValue = brokerValue > 0 ? brokerValue : holdingsValue || 1;
+  const totalValue = holdingsValue || 1;
   return {
     holdings: active,
     assets: active.map((holding) => holding.asset),
@@ -385,12 +380,12 @@ function updateHoldingLabels(portfolio) {
 
 function updateBrokerSync(portfolio) {
   if (!state.brokerValue) {
-    elements.brokerSync.textContent = `Stock holdings: ${formatCurrency(portfolio.holdingsValue)}. Add broker total to reconcile cash, after-hours, and quote timing.`;
+    elements.brokerSync.textContent = `Selected holdings: ${formatCurrency(portfolio.holdingsValue)}. Add an optional account total to reconcile cash, crypto, options, and quote timing.`;
     return;
   }
   const gap = portfolio.reconciliationValue;
   const gapLabel = gap >= 0 ? "above" : "below";
-  elements.brokerSync.textContent = `Broker total: ${formatCurrency(portfolio.brokerValue)} · Stock holdings: ${formatCurrency(portfolio.holdingsValue)} · ${formatCurrency(Math.abs(gap))} ${gapLabel} live stock marks.`;
+  elements.brokerSync.textContent = `Account total: ${formatCurrency(portfolio.brokerValue)} · Selected holdings: ${formatCurrency(portfolio.holdingsValue)} · ${formatCurrency(Math.abs(gap))} ${gapLabel} selected live marks.`;
 }
 
 function calculateMetrics(returns, drawdowns) {
@@ -598,11 +593,11 @@ function buildMemoContent(analysis) {
           <header class="memo-header">
             <div>
               <p class="eyebrow">Investment Risk Memo</p>
-              <h1>KP Portfolio Risk Review</h1>
+              <h1>Portfolio Risk Review</h1>
             </div>
             <div class="meta">
-              Broker value: ${formatCurrency(portfolio.totalValue)}<br />
-              Stock marks: ${formatCurrency(portfolio.holdingsValue)}<br />
+              Selected holdings: ${formatCurrency(portfolio.holdingsValue)}<br />
+              Account total: ${portfolio.brokerValue ? formatCurrency(portfolio.brokerValue) : "Not entered"}<br />
               Reconciliation: ${formatCurrency(portfolio.reconciliationValue)}<br />
               Lookback: ${firstDate} - ${lastDate}<br />
               Data: ${formatDate(market.latestDate)} adjusted closes
@@ -710,7 +705,7 @@ function buildRebalanceScenarios(portfolio) {
       name: "Current",
       badge: "Base",
       objective: "What you hold now",
-      description: "Your actual KP Portfolio holdings converted from shares into dollar weights.",
+      description: "The selected holdings converted from shares into dollar weights.",
       allocations: normalizeAllocations(currentAllocations),
     },
     {

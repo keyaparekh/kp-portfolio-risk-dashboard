@@ -2,12 +2,15 @@
 
 A browser-based portfolio analytics dashboard focused on investment risk and asset allocation.
 
+The app is designed as a general portfolio evaluator: users can replace the sample tickers with their own holdings, enter share counts, and optionally add an account total to reconcile cash, crypto, options, or broker quote timing.
+
 ## What It Shows
 
 - Annualized return, volatility, Sharpe ratio, max drawdown, historical VaR, and historical CVaR
 - Holdings-based portfolio construction using ticker selection and share counts
 - Searchable ticker entry when run through the local server
 - Automatic conversion from shares to market value weights using latest fetched prices
+- Optional account-total reconciliation for broker totals that include cash, crypto, or options
 - Cumulative performance and drawdown charts
 - Return distribution with VaR tail highlighting
 - Portfolio adjustment guidance based on concentration, risk contribution, diversification, and Sharpe ratio
@@ -66,7 +69,7 @@ The server reads the hosting platform's `PORT` variable automatically.
 
 ## Static Data Refresh
 
-The dashboard uses adjusted daily closes for ETFs and stocks including SPY, QQQ, TLT, GLD, VNQ, EFA, AAPL, MSFT, NVDA, AMZN, META, GOOGL, JPM, GS, BLK, and BRK-B.
+The dashboard uses adjusted daily closes for a sample set of ETFs and stocks including SPY, QQQ, VOO, BND, GLD, TLT, SGOV, AAPL, MSFT, NVDA, TSLA, AMZN, META, GOOGL, JPM, GS, BLK, and BRK-B. In live mode, users can request additional listed tickers on demand.
 
 ```bash
 python3 scripts/fetch_market_data.py
