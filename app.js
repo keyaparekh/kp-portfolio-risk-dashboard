@@ -30,6 +30,7 @@ const state = {
   liveMode: false,
   symbolsSource: "Local fallback list",
   dataSource: "Saved local market-data.js",
+  preset: "sample",
   brokerValue: 0,
   holdings: [
     { ticker: "SPY", shares: 10 },
@@ -51,6 +52,7 @@ let latestAnalysis = null;
 const elements = {
   allocations: document.getElementById("allocations"),
   tickerList: document.getElementById("tickerList"),
+  portfolioPreset: document.getElementById("portfolioPreset"),
   portfolioValue: document.getElementById("portfolioValue"),
   brokerValue: document.getElementById("brokerValue"),
   brokerSync: document.getElementById("brokerSync"),
@@ -83,6 +85,11 @@ async function init() {
 }
 
 function wireControls() {
+  elements.portfolioPreset.addEventListener("change", async (event) => {
+    state.preset = event.target.value;
+    await applyPreset(state.preset);
+  });
+
   elements.confidence.addEventListener("change", (event) => {
     state.confidence = Number(event.target.value);
     update();
@@ -291,13 +298,39 @@ async function addHolding() {
 }
 
 async function resetHoldings() {
-  state.holdings = [
-    { ticker: "SPY", shares: 10 },
-    { ticker: "QQQ", shares: 4 },
-    { ticker: "BND", shares: 20 },
-    { ticker: "GLD", shares: 3 },
-    { ticker: "NVDA", shares: 2 },
-  ];
+  await applyPreset(state.preset);
+}
+
+async function applyPreset(preset) {
+  if (preset === "individual") {
+    state.brokerValue = 67212.40;
+    state.holdings = [
+      { ticker: "NVDA", shares: 34.54 },
+      { ticker: "TSLA", shares: 13.56 },
+      { ticker: "VOO", shares: 13.72 },
+      { ticker: "SCHD", shares: 103 },
+      { ticker: "SGOV", shares: 12.43 },
+      { ticker: "QQQM", shares: 4.95 },
+      { ticker: "VXUS", shares: 52.09 },
+      { ticker: "BND", shares: 9.63 },
+      { ticker: "META", shares: 0.322 },
+      { ticker: "BABA", shares: 19 },
+      { ticker: "SMH", shares: 6.77 },
+      { ticker: "CIBR", shares: 9.74 },
+      { ticker: "BOTZ", shares: 16.07 },
+      { ticker: "VOT", shares: 2.12 },
+    ];
+  } else {
+    state.brokerValue = 0;
+    state.holdings = [
+      { ticker: "SPY", shares: 10 },
+      { ticker: "QQQ", shares: 4 },
+      { ticker: "BND", shares: 20 },
+      { ticker: "GLD", shares: 3 },
+      { ticker: "NVDA", shares: 2 },
+    ];
+  }
+  elements.brokerValue.value = state.brokerValue || "";
   await loadMarketDataForHoldings();
   renderHoldings();
   update();
